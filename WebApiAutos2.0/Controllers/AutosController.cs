@@ -16,9 +16,41 @@ namespace WebApiAutos2.Controllers
         }
 
         [HttpGet]
+        [HttpGet("Listado")]
+        [HttpGet("/Listado")]
         public async Task<ActionResult<List<Auto>>> Get()
         {
-            return await dbContext.Autos.ToListAsync();
+            return await dbContext.Autos.Include(x => x.marcas).ToListAsync();
+        }
+
+        [HttpGet("primero")]
+        public async Task<ActionResult<Auto>> PrimerAuto()
+        {
+            return await dbContext.Autos.FirstOrDefaultAsync();
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<Auto>> Get(int id)
+        {
+            var auto =  await dbContext.Autos.FirstOrDefaultAsync(x =>x.Id == id);
+
+            if(auto  == null)
+            {
+                return NotFound();
+            }
+            return auto;
+        }
+
+        [HttpGet("(nombre)")]
+        public async Task<ActionResult<Auto>> Get(string nombre)
+        {
+            var auto = await dbContext.Autos.FirstOrDefaultAsync(x => x.Nombre.Contains(nombre));
+
+            if (auto == null)
+            {
+                return NotFound();
+            }
+            return auto;
         }
 
         [HttpPost]

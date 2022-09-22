@@ -8,7 +8,8 @@
 
         public int AutoId { get; set; }
         
-        
+        public Auto Auto { get; set; }
+
 
 
     }
