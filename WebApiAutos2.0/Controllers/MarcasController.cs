@@ -9,30 +9,34 @@ namespace WebApiAutos2.Controllers
     public class MarcasController: ControllerBase
     {
         private readonly ApplicationDbContext dbContext;
+        private readonly ILogger<MarcasController> logger;
 
-        public MarcasController(ApplicationDbContext context)
+        public MarcasController(ApplicationDbContext context, ILogger<MarcasController>logger)
         {
             this.dbContext = context;
+            this.logger = logger;
         }
         
        [HttpGet]
         public async Task<ActionResult<List<Marca>>> GetAll()
         {
+            logger.LogInformation("Aqui esta el listado de marcas");
             return await dbContext.Marcas.ToListAsync();
         }
 
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Marca>> GetById(int id)
         {
+            logger.LogInformation($"El id aqui es: {id} ");
             return await dbContext.Marcas.FirstOrDefaultAsync(x => x.Id == id); 
         }
 
         [HttpPost]
         public async Task<ActionResult> Post(Marca marca)
         {
-            var existeAuto = await dbContext.Autos.AnyAsync(x => x.Id == marca.AutoId);
+            var exAuto = await dbContext.Autos.AnyAsync(x => x.Id == marca.AutoId);
             
-            if( !existeAuto)
+            if( !exAuto)
             {
                 return BadRequest($"no  existe el auto con el id: {marca.AutoId}");
             }
@@ -44,16 +48,16 @@ namespace WebApiAutos2.Controllers
         [HttpPut("{id:int}")]
         public async Task<ActionResult> Put(Marca marca, int id)
         {
-            var existe = await dbContext.Marcas.AnyAsync(x => x.Id == id);
+            var existencia = await dbContext.Marcas.AnyAsync(x => x.Id == id);
 
-            if(!existe)
+            if(!existencia)
             {
                 return NotFound("La marca especificada no existe. ");
             }
 
             if(marca.Id != id)
             {
-                return BadRequest("El id de la marca no coincide con el establecido en la url");
+                return BadRequest("El id de la marca no es el mismo de la url");
             }
 
             dbContext.Update(marca);
@@ -64,10 +68,10 @@ namespace WebApiAutos2.Controllers
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var existe = await dbContext.Marcas.AnyAsync(x => x.Id == id);
-            if(!existe)
+            var existencia = await dbContext.Marcas.AnyAsync(x => x.Id == id);
+            if(!existencia)
             {
-                return NotFound("El recurso no fue encontrado");
+                return NotFound("El recurso no se hallo");
             }
 
             dbContext.Remove(new Marca { Id = id });

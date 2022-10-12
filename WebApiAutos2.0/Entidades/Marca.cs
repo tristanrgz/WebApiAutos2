@@ -1,4 +1,6 @@
-﻿namespace WebApiAutos2.Entidades
+﻿using WebApiAutos2.Validaciones;
+
+namespace WebApiAutos2.Entidades
 {
     public class Marca
     {

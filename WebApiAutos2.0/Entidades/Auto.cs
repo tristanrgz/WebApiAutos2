@@ -1,18 +1,36 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WebApiAutos2.Validaciones;
 
 namespace WebApiAutos2.Entidades
 {
-    public class Auto
+    public class Auto: IValidatableObject
     {
         public int Id { get; set; }
-        [Required(ErrorMessage ="El campo nombre es requerido")]
-        [StringLength(maximumLength:10, ErrorMessage ="el campo solo puede tener hasta 10 caracteres")]
+        [Required(ErrorMessage = "Debe ingresar el campo nombre")]
+        [StringLength(maximumLength:20, ErrorMessage ="El campo del nombre tiene un limite de caracteres de 20")]
+        [LetraInicialMayuscula]
         public string Nombre { get; set; }
-        [Range(1930,2022, ErrorMessage ="El año de fabricacion no se encuentra en el intervalo")]
+        [Range(1940,2022, ErrorMessage ="El año de fabricacion del auto no esta en el intervalo")]
         [NotMapped]
         public int anio_fabricacion { get; set; }
         public List<Marca> marcas { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if(!string.IsNullOrEmpty(Nombre))
+            {
+                var LetraInicial = Nombre[0].ToString();
+
+                if (LetraInicial != LetraInicial.ToUpper())
+                {
+                    yield return new ValidationResult("La letra inicial debe ser mayuscula",
+                        new String[] { nameof(Nombre) });
+                }
+            }
+
+            
+        }
         
     }
 }

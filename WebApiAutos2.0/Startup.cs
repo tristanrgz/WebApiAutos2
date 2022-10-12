@@ -1,5 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Logging;
 using System.Text.Json.Serialization;
+using WebApiAutos2.Controllers;
+using WebApiAutos2.Middlewares;
+using WebApiAutos2.Services;
 
 namespace WebApiAutos2
 {
@@ -18,14 +23,37 @@ namespace WebApiAutos2
             x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
             services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("defaultConnection")));
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            services.AddTransient<IService, ServiceA>();
+            services.AddTransient<ServiceTransient>();
+            services.AddScoped<ServiceScoped>();
+            services.AddSingleton<ServiceSingleton>();
             services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo {Title="WebApiAutos2", Version="v1"});
+            });
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+
+        
+
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
-            // Configure the HTTP request pipeline.
+
+            
+
+     
+            
+
+            app.Map("/maping", app =>
+            {
+                app.Run(async context =>
+                {
+                    await context.Response.WriteAsync("Atrapando las peticiones");
+                });
+            });
+
+            
             if (env.IsDevelopment())
             {
                 app.UseSwagger();
