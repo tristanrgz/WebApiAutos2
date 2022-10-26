@@ -1,6 +1,6 @@
 ﻿namespace WebApiAutos2.Middlewares
 {
-    public static class ExtensionesMiddleware
+    public static class MiddlewareExtensions
     {
         public static IApplicationBuilder UseMiddleware(this IApplicationBuilder app)
         {

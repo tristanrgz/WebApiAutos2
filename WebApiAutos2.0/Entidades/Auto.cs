@@ -9,7 +9,7 @@ namespace WebApiAutos2.Entidades
         public int Id { get; set; }
         [Required(ErrorMessage = "Debe ingresar el campo nombre")]
         [StringLength(maximumLength:20, ErrorMessage ="El campo del nombre tiene un limite de caracteres de 20")]
-        [LetraInicialMayuscula]
+        [LetraInicialMayusculaAttribute]
         public string Nombre { get; set; }
         [Range(1940,2022, ErrorMessage ="El año de fabricacion del auto no esta en el intervalo")]
         [NotMapped]

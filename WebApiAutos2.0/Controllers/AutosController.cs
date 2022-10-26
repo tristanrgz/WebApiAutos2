@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApiAutos2.Entidades;
+using WebApiAutos2.Filtros;
 using WebApiAutos2.Services;
 
 namespace WebApiAutos2.Controllers
@@ -15,10 +17,12 @@ namespace WebApiAutos2.Controllers
         private readonly ServiceScoped serviceScoped;
         private readonly ServiceSingleton serviceSingleton;
         private readonly ILogger<AutosController> logger;
-
+        private readonly IWebHostEnvironment env;
+       
         public AutosController(ApplicationDbContext dbContext, IService service,
             ServiceTransient serviceTransient, ServiceScoped serviceScoped,
-            ServiceSingleton serviceSingleton, ILogger<AutosController> logger)
+            ServiceSingleton serviceSingleton, ILogger<AutosController> logger, 
+            IWebHostEnvironment env)
         {
             this.dbContext = dbContext;
             this.service = service;
@@ -26,8 +30,11 @@ namespace WebApiAutos2.Controllers
             this.serviceScoped = serviceScoped;
             this.serviceSingleton = serviceSingleton;
             this.logger = logger;
+            this.env = env;
         }
         [HttpGet("GUID")]
+        [ResponseCache(Duration =15)]
+        [ServiceFilter(typeof(FiltroAction))]
         public ActionResult ObtenerGuid()
         {
             return Ok(new
@@ -49,6 +56,7 @@ namespace WebApiAutos2.Controllers
         [HttpGet("/Listado")]
         public async Task<ActionResult<List<Auto>>> GetAutos()
         {
+           
             logger.LogInformation("aqui sale el listado de los autos ");
             logger.LogWarning("Un mensaje de prueba de un  Warning");
             service.EjecutarJob();
@@ -121,7 +129,7 @@ namespace WebApiAutos2.Controllers
             var existencia = await dbContext.Autos.AnyAsync(x => x.Id == id);
             if(!existencia)
             {
-                return NotFound();
+                return NotFound(" El auto nos encuentra aqui ");
             }
 
             dbContext.Remove(new Auto()

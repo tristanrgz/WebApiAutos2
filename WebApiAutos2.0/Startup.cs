@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Microsoft.Extensions.Logging;
 using System.Text.Json.Serialization;
 using WebApiAutos2.Controllers;
+using WebApiAutos2.Filtros;
 using WebApiAutos2.Middlewares;
 using WebApiAutos2.Services;
+
 
 namespace WebApiAutos2
 {
@@ -19,7 +21,10 @@ namespace WebApiAutos2
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddJsonOptions(x =>
+            services.AddControllers(opciones =>
+            {
+                opciones.Filters.Add(typeof(FiltroException));
+            }).AddJsonOptions(x =>
             x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
             services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("defaultConnection")));
@@ -27,6 +32,11 @@ namespace WebApiAutos2
             services.AddTransient<ServiceTransient>();
             services.AddScoped<ServiceScoped>();
             services.AddSingleton<ServiceSingleton>();
+            services.AddTransient<FiltroAction>();
+            services.AddHostedService<ArchivoEscrito>();
+            services.AddResponseCaching();
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {
@@ -40,11 +50,10 @@ namespace WebApiAutos2
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
 
-            
+            app.UseMiddleware();
 
      
-            
-
+ 
             app.Map("/maping", app =>
             {
                 app.Run(async context =>
@@ -63,6 +72,8 @@ namespace WebApiAutos2
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseResponseCaching();
 
             app.UseAuthorization();
 

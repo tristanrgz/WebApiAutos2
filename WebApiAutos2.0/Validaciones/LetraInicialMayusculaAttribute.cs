@@ -2,7 +2,7 @@
 
 namespace WebApiAutos2.Validaciones
 {
-    public class LetraInicialMayuscula: ValidationAttribute
+    public class LetraInicialMayusculaAttribute: ValidationAttribute
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
